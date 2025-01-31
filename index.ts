@@ -1,9 +1,8 @@
 import { configDotenv } from "dotenv";
-import { MongoClient } from "mongodb";
 import express, { Request, Response } from "express";
-import { foodCategoryRouter } from "./router/food-category";
+import { FoodCategoryRouter } from "./router/food-category";
 import { FoodRouter } from "./router/food";
-import { usersModel } from "./models/users";
+import { UserModel } from "./models/users";
 const fs = require("fs");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -18,16 +17,16 @@ const connectMongoDb = async () => {
 	await mongoose.connect(MONGODB_URI);
 };
 connectMongoDb();
-app.use("/food-category", foodCategoryRouter);
+app.use("/food-category", FoodCategoryRouter);
 app.use("/food", FoodRouter);
 
 app.get("/users", async (req: Request, res: Response) => {
-	const users = await usersModel.find();
+	const users = await UserModel.find();
 	res.json(users);
 });
 
 app.post("/users", async (req: Request, res: Response) => {
-	const newUser = await usersModel.create({
+	const newUser = await UserModel.create({
 		email: req.body.email,
 		password: req.body.password,
 		phoneNumber: req.body.phoneNumber,
@@ -45,14 +44,14 @@ app.post("/users", async (req: Request, res: Response) => {
 
 app.delete("/users/:id", async (req: Request, res: Response) => {
 	const deleteId = req.params.id;
-	const deleteUsers = await usersModel.findByIdAndDelete(deleteId);
+	const deleteUsers = await UserModel.findByIdAndDelete(deleteId);
 
 	res.json({ message: "Users deleted", deleteUsers });
 });
 
 app.put("/users/:id", async (req: Request, res: Response) => {
 	const updateId = req.params.id;
-	const usersUpdate = await usersModel.findByIdAndUpdate(
+	const usersUpdate = await UserModel.findByIdAndUpdate(
 		updateId,
 		{
 			email: req.body.email,

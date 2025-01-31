@@ -1,23 +1,23 @@
-import { model, Schema } from "mongoose";
+import { model, models, Schema } from "mongoose";
 
 const FOOD_ORDER_ITEM_SCHEMA = new Schema({
-	food: String,
-	quantity: Number,
+  food: String,
+  quantity: Number,
 });
 
-const FOOD_ORDER_SCHEMA = new Schema(
-	{
-		user: String,
-		totalPrices: Number,
-		foodOrderitems: [FOOD_ORDER_ITEM_SCHEMA],
-		status: {
-			type: String,
-			enum: ["pending", "cancelled", "delivered"],
-			default: "pending",
-		},
-	},
-	{
-		timestamps: true,
-	}
+export const FOOD_ORDER_SCHEMA = new Schema(
+  {
+    user: String,
+    totalPrice: Number,
+    foodOrderItems: [FOOD_ORDER_ITEM_SCHEMA],
+    status: { type: String, enum: ["PENDING", "CANCELED", "DELIVERED"] },
+  },
+  {
+    timestamps: true,
+  }
 );
-const foodOrder = model("FoodOrder", FOOD_ORDER_SCHEMA);
+
+const FoodOrderModel =
+  models["FoodOrder"] || model("FoodOrder", FOOD_ORDER_SCHEMA);
+
+export { FoodOrderModel };

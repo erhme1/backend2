@@ -1,40 +1,47 @@
 import { Request, Response, Router } from "express";
 import { FoodCategoryModel } from "../models/food-category";
 
-export const foodCategoryRouter = Router();
+export const FoodCategoryRouter = Router();
 
-foodCategoryRouter.get("/", async (req, res) => {
-    const items = await FoodCategoryModel.find();
-    res.json(items);
+FoodCategoryRouter.get("/", async (req: Request, res: Response) => {
+  const foodCategories = await FoodCategoryModel.find();
+  res.send(foodCategories);
 });
 
-foodCategoryRouter.post("", async (req: Request, res: Response) => {
-    const {body} = req;
-    console.log(body);
-    const newItem = await FoodCategoryModel.create({...body});
-
-    res.json({
-        message: "New category added",
-        newItem,
-    })
+FoodCategoryRouter.get("/:id", async (req: Request, res: Response) => {
+  const id = req.params;
+  const item = await FoodCategoryModel.find({ _id: id });
+  res.send(item);
 });
 
-foodCategoryRouter.get('/:id', async (req: Request, res: Response) => {
-    const id = req.params.id;
-    const item = await FoodCategoryModel.findById(id);
-    res.json(item);
-})
+FoodCategoryRouter.post("/", async (req: Request, res: Response) => {
+  const {body} = req;
+  await FoodCategoryModel.create({ ...body });
+  const foodCategories = await FoodCategoryModel.find();
 
-foodCategoryRouter.put(":id", async (req: Request, res: Response) => {
-    const updatedItem = await FoodCategoryModel.findByIdAndUpdate(
-        req.params.id,
-        { categoryName: req.body.categoryName },
-        { new: true }
+  res.send(foodCategories);
+});
+
+FoodCategoryRouter.put("/:id", async (req: Request, res: Response) => {
+  const { params, body } = req; 
+  const foodCategoryId = params.id;
+  const item = await FoodCategoryModel.find({ _id: foodCategoryId });
+  const updatedItem = await FoodCategoryModel.findByIdAndUpdate(
+    foodCategoryId,
+    { ...item, ...body },
+    { new: true }
+  );
+
+  res.json(updatedItem);
+});
+
+FoodCategoryRouter.delete(
+  "/:id",
+  async (req: Request<{ id: string }>, res: Response) => {
+    const foodCategoryId = req.params.id;
+    const deletedCategory = await FoodCategoryModel.findByIdAndDelete(
+      foodCategoryId
     );
-    res.json(updatedItem);
-});
-
-foodCategoryRouter.delete("/:id", async (req: Request, res: Response) => {
-    const deletedItem = await FoodCategoryModel.findByIdAndDelete(req.params.id);
-    res.json(deletedItem);
-});
+    res.send("Deleted this item: " + deletedCategory);
+  }
+);
